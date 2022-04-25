@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "github.com/MarcosC19/SO1-Practica2-201900874/grpc-server/protos";
+
+package practica2;
+
+// playing service definition
+service PlayGame {
+  rpc Playing (GameRequest) returns (GameReply) {}
+}
+
+// the request message containing the game id and players number
+message GameRequest {
+  int32 gameId = 1;
+  int32 players = 2;
+}
+
+// the response message containing the game results
+message GameReply {
+  int32 gameId = 1;
+  int32 players = 2;
+  string gameName = 3;
+  int32 winner = 4;
+}
