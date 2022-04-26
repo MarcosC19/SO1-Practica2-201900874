@@ -1,17 +1,11 @@
-FROM golang:1.16.14-alpine
-
+FROM node:16-alpine
 WORKDIR /
-
-COPY go.mod go.sum ./
-
-RUN go mod download
-
 COPY . .
-
-ENV HOSTIP_KAFKA 192.168.1.10:9092
-
-RUN go build -o /goServer
-
+RUN npm install
+ENV gRPC_SERVER_PORT 50051
+ENV RABBIT_SERVER messagequeue
+ENV RABBIT_USER rabbit
+ENV RABBIT_PASSWORD sopes1
+ENV RABBIT_QUEUE GameQueue
 EXPOSE 50051
-
-CMD ["/goServer"]
+CMD ["npm","start"]

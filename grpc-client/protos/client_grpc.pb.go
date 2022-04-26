@@ -97,5 +97,5 @@ var PlayGame_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protos/server.proto",
+	Metadata: "protos/client.proto",
 }

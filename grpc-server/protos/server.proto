@@ -1,6 +1,9 @@
 syntax = "proto3";
 
-option go_package = "github.com/MarcosC19/SO1-Practica2-201900874/grpc-server/protos";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.server";
+option java_outer_classname = "ServerProto";
+option objc_class_prefix = "SVR";
 
 package practica2;
 
@@ -11,14 +14,11 @@ service PlayGame {
 
 // the request message containing the game id and players number
 message GameRequest {
-  int32 gameId = 1;
+  int32 gameid = 1;
   int32 players = 2;
 }
 
 // the response message containing the game results
 message GameReply {
-  int32 gameId = 1;
-  int32 players = 2;
-  string gameName = 3;
-  int32 winner = 4;
+  int32 status = 1;
 }

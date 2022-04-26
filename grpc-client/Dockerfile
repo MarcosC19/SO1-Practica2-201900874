@@ -1,15 +1,9 @@
-FROM node:16-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-
+FROM golang:1.16.14-alpine
+WORKDIR /
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-
+ENV IP_SERVER 192.168.1.10
+RUN go build -o /goClient
 EXPOSE 8080
-
-RUN npm install
-
-ENV IP_SERVER=localhost
-
-CMD ["npm", "run", "start"]
+CMD ["/goClient"]
