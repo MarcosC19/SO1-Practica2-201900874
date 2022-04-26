@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	pb "github.com/MarcosC19/SO1-Practica2-201900874/grpc-server/protos"
+	pb "github.com/MarcosC19/SO1-Practica2-201900874/grpc-client/protos"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -23,11 +23,14 @@ type DataGame struct {
 func PlayGame(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// GETTING DATA BODY FOR DATAGAME STRUCT
 	var game DataGame
 
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, &game)
 
+	// CONNETING TO gRPC SERVER
 	path := os.Getenv("IP_SERVER")
 	if len(path) == 0 {
 		path = "localhost:50051"
@@ -40,10 +43,10 @@ func PlayGame(w http.ResponseWriter, r *http.Request) {
 
 	c := pb.NewPlayGameClient(conn)
 
-	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
+	// CALLING THE METHOD PLAYING TO RUN A GAME
 	reply, err := c.Playing(ctx, &pb.GameRequest{
 		GameId:  game.GameId,
 		Players: game.Players,
@@ -53,6 +56,7 @@ func PlayGame(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("could not greet: %v", err)
 	}
 
+	// RETURN THE RESPONSE
 	json.NewEncoder(w).Encode(struct {
 		Status int32 `json:"status"`
 	}{Status: reply.GetStatus()})

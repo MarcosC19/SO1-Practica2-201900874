@@ -1,4 +1,4 @@
-module github.com/MarcosC19/SO1-Practica2-201900874/grpc-server
+module github.com/MarcosC19/SO1-Practica2-201900874/grpc-client
 
 go 1.16
 

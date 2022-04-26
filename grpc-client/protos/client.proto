@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/MarcosC19/SO1-Practica2-201900874/grpc-server/protos";
+option go_package = "github.com/MarcosC19/SO1-Practica2-201900874/grpc-client/protos";
 
 package practica2;
 

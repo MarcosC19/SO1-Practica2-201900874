@@ -1,6 +1,10 @@
 var PROTO_PATH = "./protos/server.proto";
 
-const { rps, flipit, bigBrother, smallBrother, roulette } = require('./helpers/Games');
+const { rps } = require('./helpers/Game1');
+const { flipit } = require('./helpers/Game2');
+const { bigBrother } = require('./helpers/Game3');
+const { smallBrother } = require('./helpers/Game4');
+const { roulette } = require('./helpers/Game5');
 
 const amqp = require('amqplib/callback_api');
 const grpc = require('@grpc/grpc-js');
@@ -17,76 +21,67 @@ const packageDefinition = protoLoader.loadSync(
     }
 );
 
-const proyectDef = grpc.loadPackageDefinition(packageDefinition).practica2;
+const practica2_proto = grpc.loadPackageDefinition(packageDefinition).practica2;
 
-const ServerPort = process.env.gRPC_SERVER_PORT || 50051;
-const RabbitServer = process.env.RABBIT_SERVER || "localhost";
-const RabbitPort = process.env.RABBIT_PORT || 5672;
-const RabbitUser = process.env.RABBIT_USER || "rabbit";
-const RabbitPass = process.env.RABBIT_PASSWORD || "sopes1";
-const RabbitQueue = process.env.RABBIT_QUEUE || "GameQueue";
-var RabbitChannel = undefined;
+const IPRabbit = process.env.HOSTNAME_RABBIT || "localhost";
+const UserRabbit = "rabbit";
+const PassRabbit = "sopes1";
+const ColaRabbit = "GamesQueue";
+var CanalRabbit = undefined;
 
-function getGame(id){
-    switch(id){
+function Playing(call, callback) {
+    let gameName;
+    let winner;
+
+    switch (call.request.gameid) {
         case 1:
-            return rps;
+            gameName = "Piedra, Papel o Tijeras";
+            winner = rps(call.request.players);
+            break;
         case 2:
-            return flipit;
+            gameName = "Cara o Cruz";
+            winner = flipit(call.request.players);
+            break;
         case 3:
-            return bigBrother;
+            gameName = "Numero mayor";
+            winner = bigBrother(call.request.players);
+            break;
         case 4:
-            return smallBrother;
+            gameName = "Numero menor";
+            winner = smallBrother(call.request.players);
+            break;
         case 5:
-            return roulette;
+            gameName = "Ruleta";
+            winner = roulette(call.request.players);
+            break;
         default:
-            return rps;
+            gameName = "Piedra, Papel o Tijeras";
+            winner = rps(call.request.players);
+            break;
     }
-}
-
-function getGameName(id){
-    switch(id){
-        case 1:
-            return "Piedra, Papel o Tijeras";
-        case 2:
-            return "Cara o Cruz";
-        case 3:
-            return "Numero mayor";
-        case 4:
-            return "Numero menor";
-        case 5:
-            return "Ruleta";
-        default:
-            return rps;
-    }
-}
-
-function Playing(call, callback){
-    let fgame = getGame(call.request.gameid);
-    let winner = fgame(call.request.players);
 
     let log = {
         game_id: parseInt(call.request.gameid),
         players: parseInt(call.request.players),
-        game_name: getGameName(call.request.gameid),
+        game_name: gameName,
         winner: parseInt(winner),
         queue: "RabbitMQ"
     }
 
-    RabbitChannel.sendToQueue(RabbitQueue, Buffer.from(JSON.stringify(log)));
+    CanalRabbit.sendToQueue(ColaRabbit, Buffer.from(JSON.stringify(log)));
 
     callback(null, {
         status: 1
     });
 }
 
-function startServer() {
+function main() {
     var server = new grpc.Server();
-    server.addService(proyectDef.PlayGame.service, {
+    server.addService(practica2_proto.PlayGame.service, {
         Playing: Playing
     });
     server.bindAsync(
-        `0.0.0.0:${ServerPort}`,
+        `0.0.0.0:50051`,
         grpc.ServerCredentials.createInsecure(),
         () => {
             server.start();
@@ -94,32 +89,27 @@ function startServer() {
     );
 }
 
-const channelCreation = (error, channel) => {
-    if(error){
-        console.log("Error with channel creation:",error);
-        return;
-    }
-
-    RabbitChannel = channel;
-    RabbitChannel.assertQueue(RabbitQueue, {
-        durable: false
-    });
-    console.log("GameQueue creation - OK");
-}
-
-const connectionResult = async (error, connection) => {
-    if(error){
-        console.log("Error with the connection:",error);
-        return;
-    }
-    console.log("Connection to RabbitMQ server succeed");
-    this.RabbitConn = connection;
-    this.RabbitConn.createChannel(channelCreation);
-}
-
 const rabbitConnect = () => {
-    amqp.connect(`amqp://${RabbitUser}:${RabbitPass}@${RabbitServer}`, connectionResult);
+    amqp.connect(`amqp://${UserRabbit}:${PassRabbit}@${IPRabbit}`, async (error, connection) => {
+        if (error) {
+            console.log("Error with connection:", error);
+            return;
+        }
+        console.log("Succesfully Rabbit connection");
+        connection.createChannel((error, channel) => {
+            if (error) {
+                console.log("Error with channel creation:", error);
+                return;
+            }
+
+            CanalRabbit = channel;
+            CanalRabbit.assertQueue(ColaRabbit, {
+                durable: false
+            });
+            console.log("Successfully created queue");
+        });
+    });
 }
 
-delay(rabbitConnect,10000);
-delay(startServer,15000);
+delay(rabbitConnect, 5000);
+delay(main, 2500);

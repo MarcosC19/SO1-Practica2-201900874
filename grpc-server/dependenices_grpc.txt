@@ -1,1 +1,0 @@
-npm install @grpc/grpc-js @grpc/proto-loader async google-protobuf lodash minimist
