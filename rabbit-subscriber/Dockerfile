@@ -3,7 +3,7 @@ WORKDIR /
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . . 
-ENV RABBIT_HOST 192.168.1.10
-ENV HOSTIP_MONGO 192.168.1.10
+ENV RABBIT_HOST 34.71.238.30
+ENV HOSTIP_MONGO 35.239.101.118
 RUN go build -o goRabbitSubscriber
 CMD ["/goRabbitSubscriber"]

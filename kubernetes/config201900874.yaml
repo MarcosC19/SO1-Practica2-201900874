@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: practica2-201900874
+spec: {}
+status: {}
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmqcluster
+  namespace: practica2-201900874
+spec:
+  image: rabbitmq:management-alpine
+  replicas: 1
+  service:
+    type: ClusterIP
+  rabbitmq:
+    additionalConfig: |
+      default_user=rabbit
+      default_pass=sopes1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: grpc
+  name: grpc
+  namespace: practica2-201900874
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: grpc
+    spec:
+      containers:
+      - image: curtex19/client_grpc_201900874
+        name: client-grpc-201900874-5g9kr
+        env:
+        - name: IP_SERVER
+          value: localhost:50051
+      - image: curtex19/server_grpc_201900874
+        name: server-grpc-201900874-qms2p
+        env:
+        - name: HOSTNAME_RABBIT
+          value: rabbitmqcluster
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: subscriber
+  name: subscriber
+  namespace: practica2-201900874
+spec:
+  containers:
+  - image: curtex19/rabbit_subscriber_201900874
+    name: subscriber
+    env:
+    - name: RABBIT_HOST
+      value: rabbitmqcluster
+    - name: HOSTIP_MONGO
+      value: 35.239.101.118
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: grpc
+  name: grpc
+  namespace: practica2-201900874
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: grpc
+  type: LoadBalancer
+status:
+  loadBalancer: {}
