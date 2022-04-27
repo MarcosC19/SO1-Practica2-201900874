@@ -70,7 +70,7 @@ spec:
     - name: RABBIT_HOST
       value: rabbitmqcluster
     - name: HOSTIP_MONGO
-      value: 35.239.101.118
+      value: 34.71.125.195
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}

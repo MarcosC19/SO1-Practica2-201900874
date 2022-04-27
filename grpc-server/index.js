@@ -111,5 +111,5 @@ const rabbitConnect = () => {
     });
 }
 
-delay(rabbitConnect, 5000);
+delay(rabbitConnect, 50000);
 delay(main, 2500);

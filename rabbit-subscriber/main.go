@@ -18,7 +18,7 @@ const (
 )
 
 func main() {
-	time.Sleep(15 * time.Second)
+	time.Sleep(60 * time.Second)
 
 	// GETTING ENVIROMENT "RABBIT_HOST"
 	RabbitHost := os.Getenv("RABBIT_HOST")
@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// CONNECTING TO RABBIT WITH CREDENTIALS
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", RabbitUser, RabbitPass, RabbitHost, RabbitPort))
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s", RabbitUser, RabbitPass, RabbitHost))
 
 	if err != nil {
 		fmt.Println("Error al conectar a Rabbit", err)

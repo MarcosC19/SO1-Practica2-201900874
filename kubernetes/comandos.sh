@@ -7,11 +7,11 @@ kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/latest/do
 # CREACION NAMESPACE
 kubectl create namespace practica2-201900874 --dry-run -o yaml > config201900874.yaml
 
-# CREACION DEPLOYMENT
+# CREACION DEPLOYMENT GRCP CLIENT-SERVER
 kubectl create deploy grpc --namespace practica2-201900874 --image=curtex19/client_grpc_201900874 --image=curtex19/server_grpc_201900874 --replica=1 --dry-run -o yaml >> config201900874.yaml
 
-# CREACION RABBIT SUBSCRIBER
+# CREACION POD RABBIT SUBSCRIBER
 kubectl run subscriber --image=curtex19/rabbit_subscriber_201900874 --restart=Never --namespace=practica2-201900874 --dry-run -o yaml >> config201900874.yaml
 
-# CREACION LOADBALANCER
+# CREACION LOADBALANCER DEPLOYMENT
 kubectl expose deploy/grpc --type=LoadBalancer --port=8080 --namespace=practica2-201900874 --dry-run=client -o yaml >> config201900874.yaml
